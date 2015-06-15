@@ -74,11 +74,11 @@ function generaTransformaciones1flip(n)
     Qbits = 2*n
     dosote = big(2)
     baseQ = int(big(2)^(2*n))
-    transformaciones = Array(SparseMatrixCSC{Float64,Int64},Qbits)
+    transformaciones = Array(SparseMatrixCSC{Int64,Int64},Qbits)
     for mutación in 0:int(Qbits)-1
-        estado1flip = speye(baseQ)
+        estado1flip = speye(Int64,baseQ)
         for estado in 0:baseQ-1
-           estadomutado = estado $ (dosote^mutación)
+           estadomutado = int(estado $ (dosote^mutación))
            mutadovector = numtoQvector(estadomutado,n)
            columna = mutadovector
            estado1flip[:,estado+1] = columna
