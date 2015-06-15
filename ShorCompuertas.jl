@@ -3,7 +3,7 @@ module algoritmoShor
 export numtoQvector, xytoQstateNum, generaQFT, generaQFTinv, generamodN, generaTransformaciones1flip, aplicaError
 
 function numtoQvector(num,n)
-    sparse(vcat(zeros(int(num)),[1],zeros(int(big(2)^(2*n)-num-1))))
+    sparsevec([num+1],[1],int(big(2)^(2*n)))
 end
 
 function xytoQstateNum(x,y,n)
@@ -20,22 +20,26 @@ end
 function generaQFT(n)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
-    QFT = zeros(Complex128,(baseQ,baseQ))
+    QFT = speye(Complex128,baseQ)
     for estado in 0:(baseQ-1)
         x,y = QstateNumtoxy(estado,n)
         columna = zeros(baseQ)
         for estadoreg1 in 0:(Q -1)
-            numestado = xytoQstateNum(estadoreg1,y,n)
-            columna += exp(2*pi*im*x*estadoreg1/Q)*numtoQvector(numestado,n)/sqrt(Q)
+		try
+		    numestado = xytoQstateNum(estadoreg1,y,n)
+		    columna += exp(2*pi*im*x*estadoreg1/Q)*numtoQvector(numestado,n)/sqrt(Q)
+	    catch
+		    println(x,",",y,",",estadoreg1)
+	    end
         end
         QFT[1:end,estado+1]=columna
     end
-           sparse(QFT)
+           QFT
 end
 function generaQFTinv(n)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
-    QFTinv = zeros(Complex128,(baseQ,baseQ))
+    QFTinv = speye(Complex128,baseQ)
     for estado in 0:(baseQ-1)
         x,y = QstateNumtoxy(estado,n)
         columna = zeros(baseQ)
@@ -45,7 +49,7 @@ function generaQFTinv(n)
         end
         QFTinv[1:end,estado+1]=columna
     end
-    sparse(QFTinv)
+    QFTinv
 end
 
 function generamodN(n,N,a)

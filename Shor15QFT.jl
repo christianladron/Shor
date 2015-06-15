@@ -8,9 +8,6 @@ baseQ=big(int(big(2)^(2*n)))
 #=ρ0 = Ψ0*Ψ0';=#
 pflip = 0.001
 
-
-
-
 #=flips = generaTransformaciones1flip(n)=#
 QFT=generaQFT(n)
 #=QFTinv=generaQFTinv(n)=#
