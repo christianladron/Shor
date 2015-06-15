@@ -22,17 +22,20 @@ function generaQFT(n)
     baseQ=int(Q^2)
     QFT = speye(Complex128,baseQ)
     for estado in 0:(baseQ-1)
+	    QFT[estado+1,estado+1]=0
         x,y = QstateNumtoxy(estado,n)
-        columna = zeros(baseQ)
+	regxencero = int(xytoQstateNum(0,y,n))
         for estadoreg1 in 0:(Q -1)
 		try
-		    numestado = xytoQstateNum(estadoreg1,y,n)
-		    columna += exp(2*pi*im*x*estadoreg1/Q)*numtoQvector(numestado,n)/sqrt(Q)
+		    #=numestado = xytoQstateNum(estadoreg1,y,n)=#
+		    numestado = regxencero + estadoreg1
+		    #=columna += exp(2*pi*im*x*estadoreg1/Q)*numtoQvector(numestado,n)/sqrt(Q)=#
+		    QFT[numestado+1,estado+1] += exp(2*pi*im*x*estadoreg1/Q)/sqrt(Q)
 	    catch
 		    println(x,",",y,",",estadoreg1)
 	    end
         end
-        QFT[1:end,estado+1]=columna
+        #QFT[1:end,estado+1]=columna
     end
            QFT
 end
@@ -41,13 +44,13 @@ function generaQFTinv(n)
     baseQ=int(Q^2)
     QFTinv = speye(Complex128,baseQ)
     for estado in 0:(baseQ-1)
+	    QFTinv[estado+1,estado+1]=0
         x,y = QstateNumtoxy(estado,n)
-        columna = zeros(baseQ)
+	regxencero = int(xytoQstateNum(0,y,n))
         for estadoreg1 in 0:(Q -1)
-            numestado = xytoQstateNum(estadoreg1,y,n)
-            columna += exp(-2*pi*im*x*estadoreg1/Q)*numtoQvector(numestado,n)/sqrt(Q)
+	    numestado = regxencero + estadoreg1
+	    QFTinv[numestado+1,estado+1] += exp(2*pi*im*x*estadoreg1/Q)/sqrt(Q)
         end
-        QFTinv[1:end,estado+1]=columna
     end
     QFTinv
 end
@@ -102,5 +105,21 @@ function aplicaError(ρ,pmuta,transformaciones)
     end
     ρf
 end
+QFT6=open("QFT6.juliaobj")
+QFT = deserialize(QFT6)
+close(QFT6)
 
+QFTinv6=open("QFTinv6.juliaobj")
+QFTinv = deserialize(QFTinv6)
+close(QFTinv6)
+
+
+mod6a5n6=open("mod6a5n6.juliaobj")
+mod6a5 = deserialize(mod6a5n6)
+close(mod6a5n6)
+
+
+flips6=open("flips6.juliaobj")
+flips = deserialize(flips6)
+close(flips6)
 end
