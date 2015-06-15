@@ -2,22 +2,22 @@ module algoritmoShor
 
 export numtoQvector, xytoQstateNum, generaQFT, generaQFTinv, generamodN, generaTransformaciones1flip, aplicaError
 
-function numtoQvector(num,n)
+function numtoQvector(num::Int,n::Int)
     sparsevec([num+1],[1],int(2^(2*n)))
 end
 
-function xytoQstateNum(x,y,n)
+function xytoQstateNum(x::Int,y::Int,n::Int)
     x+y*big(2)^(n)
 end
 
-function QstateNumtoxy(num,n)
+function QstateNumtoxy(num::Int,n::Int)
     maxreg = 2^n -1
     y = num>>n
     x = num & (maxreg)
     (x,y)
 end
 
-function generaQFT(n)
+function generaQFT(n::Int)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
     QFT = speye(Complex128,baseQ)
@@ -39,7 +39,7 @@ function generaQFT(n)
     end
            QFT
 end
-function generaQFTinv(n)
+function generaQFTinv(n::Int)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
     QFTinv = speye(Complex128,baseQ)
@@ -49,31 +49,32 @@ function generaQFTinv(n)
 	regxencero = int(xytoQstateNum(0,y,n))
         for estadoreg1 in 0:(Q -1)
 	    numestado = regxencero + estadoreg1
-	    QFTinv[numestado+1,estado+1] += exp(2*pi*im*x*estadoreg1/Q)/sqrt(Q)
+	    QFTinv[numestado+1,estado+1] += exp(-2*pi*im*x*estadoreg1/Q)/sqrt(Q)
         end
     end
     QFTinv
 end
 
-function generamodN(n,N,a)
+function generamodN(n::Int,N::Int,a::Int)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
     modN = speye(Int64,baseQ)*0
     for estado in 0:baseQ-1
+	    modN[estado+1,estado+1] = 0
         x,y = QstateNumtoxy(estado,n)
         nuevoestado = y
+	modestadonum = estado
             if nuevoestado < N
             nuevoestado = int((nuevoestado*big(a)^x)%N)
+        modestadonum = xytoQstateNum(x,nuevoestado,n)
             end
    #     println(x,",",y,",",nuevoestado)
-        modestadonum = xytoQstateNum(x,nuevoestado,n)
-        columna = numtoQvector(int(modestadonum),n)
-        modN[:,estado+1] = columna
+        modN[modestadonum+1,estado+1] = 1
     end
     modN
 end
 
-function generaTransformaciones1flip(n)
+function generaTransformaciones1flip(n::Int)
     Qbits = 2*n
     dosote = big(2)
     baseQ = int(big(2)^(2*n))
@@ -81,10 +82,9 @@ function generaTransformaciones1flip(n)
     for mutación in 0:int(Qbits)-1
         estado1flip = speye(Int64,baseQ)
         for estado in 0:baseQ-1
+		estado1flip[estado+1,estado+1] = 0
            estadomutado = int(estado $ (dosote^mutación))
-           mutadovector = numtoQvector(estadomutado,n)
-           columna = mutadovector
-           estado1flip[:,estado+1] = columna
+           estado1flip[estadomutado+1,estado+1] = 1
         end
         transformaciones[mutación+1] = estado1flip
     end
