@@ -3,7 +3,7 @@ module algoritmoShor
 export numtoQvector, xytoQstateNum, generaQFT, generaQFTinv, generamodN, generaTransformaciones1flip, aplicaError
 
 function numtoQvector(num,n)
-    sparsevec([num+1],[1],int(big(2)^(2*n)))
+    sparsevec([num+1],[1],int(2^(2*n)))
 end
 
 function xytoQstateNum(x,y,n)
@@ -55,16 +55,16 @@ end
 function generamodN(n,N,a)
     Q=int(big(2)^n)
     baseQ=int(Q^2)
-    modN = speye(baseQ,baseQ)*0
+    modN = speye(Int64,baseQ)*0
     for estado in 0:baseQ-1
         x,y = QstateNumtoxy(estado,n)
         nuevoestado = y
             if nuevoestado < N
-            nuevoestado = (nuevoestado*big(a)^x)%N
+            nuevoestado = int((nuevoestado*big(a)^x)%N)
             end
    #     println(x,",",y,",",nuevoestado)
         modestadonum = xytoQstateNum(x,nuevoestado,n)
-        columna = numtoQvector(modestadonum,n)
+        columna = numtoQvector(int(modestadonum),n)
         modN[:,estado+1] = columna
     end
     modN
